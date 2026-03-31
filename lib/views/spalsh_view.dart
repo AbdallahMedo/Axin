@@ -2,8 +2,6 @@ import 'package:axin/views/home_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../cubits/get_weather_cubit/get_weather_cubit.dart';
-
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
 
@@ -20,8 +18,6 @@ class _SplashScreenState extends State<SplashScreen> {
         context,
         MaterialPageRoute(builder: (context) => const HomeView()),
       );
-      var getWeatherCubit =  BlocProvider.of<GetWeatherCubit>(context);
-      getWeatherCubit.getWeather();
     });
   }
 

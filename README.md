@@ -1,16 +1,29 @@
-# axin
+# Axin Smart Home App
 
-A new Flutter project.
+تطبيق ذكي للتحكم في المنزل باستخدام Home Assistant.
 
-## Getting Started
+## هيكل الـ API النظيف (Clean API Structure)
 
-This project is a starting point for a Flutter application.
+تم تنظيم الـ API بحيث يتبع تسلسل هرمي منطقي:
+1. **الطوابق (Floors)**: يتم جلب كافة الطوابق المسجلة في Home Assistant.
+2. **الغرف (Rooms/Areas)**: كل طابق يحتوي على الغرف المرتبطة به فقط.
+3. **الأجهزة (Entities)**: كل غرفة تحتوي على الأجهزة المرتبطة بها فقط.
 
-A few resources to get you started if this is your first Flutter project:
+### المسارات المستخدمة (Endpoints)
+- `GET /api/config`: لجلب إعدادات المنزل واسم المستخدم.
+- `GET /api/config/floor_registry`: لجلب قائمة الطوابق.
+- `GET /api/config/area_registry`: لجلب قائمة الغرف.
+- `GET /api/states`: لجلب حالة كافة الأجهزة وتصفيتها حسب الغرفة.
+- `POST /api/services/{domain}/toggle`: للتحكم في تشغيل وإطفاء الأجهزة.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## الميزات الجديدة
+- **التحكم الديناميكي**: عرض الطوابق والغرف والأجهزة بناءً على البيانات الفعلية من Home Assistant.
+- **واجهة مستخدم محسنة**: تغيير مظهر حاوية الجهاز عند التشغيل (On) والإطفاء (Off) مع الحفاظ على ثيم التطبيق.
+- **إزالة الـ Weather API**: تم استبدال بيانات الطقس بتحية شخصية "Hi [Name]" باستخدام الاسم المسجل في النظام.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## كيفية الإعداد
+1. قم بتعديل `baseUrl` و `token` في ملف `lib/services/ha_service.dart`.
+2. تأكد من أن جهازك والـ Home Assistant على نفس الشبكة.
+
+## الثيم (Theme)
+تم الحفاظ على الثيم الأصلي للتطبيق (Dark Blue) مع إضافة لمسات تفاعلية (Orange accent) للأجهزة النشطة.

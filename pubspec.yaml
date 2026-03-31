@@ -41,6 +41,7 @@ dependencies:
   shared_preferences: ^2.5.2
   dio: ^5.8.0+1
   flutter_bloc: ^9.1.0
+  web_socket_channel: ^3.0.1
 
 dev_dependencies:
   flutter_test:

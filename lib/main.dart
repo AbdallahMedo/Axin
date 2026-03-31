@@ -1,18 +1,17 @@
 import 'package:axin/theme/theme_provider.dart';
-import 'package:axin/views/home_view.dart';
 import 'package:axin/views/spalsh_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
-
-import 'cubits/get_weather_cubit/get_weather_cubit.dart';
-import 'cubits/get_weather_cubit/get_weather_states.dart';
+import 'package:dio/dio.dart';
+import 'services/ha_service.dart';
+import 'cubits/ha_cubit/ha_cubit.dart';
 
 void main() {
   runApp(
     ChangeNotifierProvider(
       create: (context) => ThemeProvider(),
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }
@@ -20,25 +19,28 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => GetWeatherCubit(),
-      child: Builder(
-        builder:(context)=> BlocBuilder<GetWeatherCubit ,WeatherState>(
-          builder: (context,state)
-          {
-            return MaterialApp(
-              debugShowCheckedModeBanner: false,
-              home: const SplashScreen(),
-            );
+    final dio = Dio(
+      BaseOptions(
+        connectTimeout: const Duration(seconds: 5),
+        receiveTimeout: const Duration(seconds: 5),
+      ),
+    );
 
-          },
-
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => HACubit(
+            HAWebSocketService(),
+            HAWebSocketService(),
+          )..fetchData(),
         ),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: const SplashScreen(),
       ),
     );
   }
 }
-
