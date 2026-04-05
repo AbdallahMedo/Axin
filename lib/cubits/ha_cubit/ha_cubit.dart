@@ -1,5 +1,6 @@
 // ha_cubit.dart
 import 'dart:async';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dio/dio.dart';
 import '../../services/ha_service.dart';
@@ -183,6 +184,61 @@ class HACubit extends Cubit<HAState> {
       }
     } catch (e) {}
   }
+  Future<void> setBrightness(String entityId, int brightness) async {
+    try {
+      await _service.setBrightness(entityId, brightness);
+    } catch (e) {
+      emit(HAError("Failed to set brightness: ${e.toString()}"));
+    }
+  }
+
+  Future<void> setFanSpeed(String entityId, String speed) async {
+    try {
+      await _service.setFanSpeed(entityId, speed);
+    } catch (e) {
+      emit(HAError("Failed to set fan speed: ${e.toString()}"));
+    }
+  }
+
+  Future<void> setCoverPosition(String entityId, int position) async {
+    try {
+      await _service.setCoverPosition(entityId, position);
+    } catch (e) {
+      emit(HAError("Failed to set cover position: ${e.toString()}"));
+    }
+  }
+
+  Future<void> setTemperature(String entityId, double temperature) async {
+    try {
+      await _service.setTemperature(entityId, temperature);
+    } catch (e) {
+      emit(HAError("Failed to set temperature: ${e.toString()}"));
+    }
+  }
+
+  Future<void> setHVACMode(String entityId, String mode) async {
+    try {
+      await _service.setHVACMode(entityId, mode);
+    } catch (e) {
+      emit(HAError("Failed to set HVAC mode: ${e.toString()}"));
+    }
+  }
+  Future<void> setInputNumber(String entityId, double value) async {
+    try {
+      await _service.setInputNumber(entityId, value);
+    } catch (e) {
+      debugPrint('setInputNumber error: $e');
+    }
+  }
+
+  Future<void> setInputSelect(String entityId, String option) async {
+    try {
+      await _service.setInputSelect(entityId, option);
+    } catch (e) {
+      debugPrint('setInputSelect error: $e');
+    }
+  }
+
 
   @override
   Future<void> close() {

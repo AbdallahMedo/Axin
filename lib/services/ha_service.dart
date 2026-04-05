@@ -1,15 +1,12 @@
-// ha_service.dart
 import 'dart:async';
 import 'dart:convert';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:dio/dio.dart';
 
 class HAWebSocketService {
-  final String host = '192.168.1.5';
-  final int port = 8123;
-  final String token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI5NDIyNjBiNGUwYzU0YWU2ODc2Njk4NzFiZjI4MDM0ZCIsImlhdCI6MTc3NDkwMDk1OSwiZXhwIjoyMDkwMjYwOTU5fQ.emSCOUoOPoxMjhQeqTNQ2Btd3iZteGdy0qQu0rs1bCY';
-
+  final String host;
+  final int port;
+  final String token;
   late final Dio _dio;
 
   WebSocketChannel? _channel;
@@ -35,7 +32,10 @@ class HAWebSocketService {
   int _roomsRequestId = 0;
   int _entityRegistryRequestId = 0;
 
-  HAWebSocketService() {
+  HAWebSocketService({
+    required this.host,
+    required this.token,
+  }) : port = 8123 {
     _dio = Dio(BaseOptions(
       baseUrl: 'http://$host:$port/api',
       headers: {
@@ -44,6 +44,7 @@ class HAWebSocketService {
       },
     ));
   }
+
 
   Future<List<Map<String, dynamic>>> getAllEntities() async {
     try {
@@ -102,6 +103,8 @@ class HAWebSocketService {
             entityId.startsWith('media_player.') ||
             entityId.startsWith('climate.') ||
             entityId.startsWith('vacuum.') ||
+            entityId.startsWith('input_number.') ||
+            entityId.startsWith('input_select.')    ||
             entityId.startsWith('input_boolean.')) {
           totalDevices++;
           if (state == 'on' ||
@@ -165,7 +168,7 @@ class HAWebSocketService {
       _requestRooms();
       _requestEntityRegistry();
       _subscribeToStateChanges();
-      _subscribeToRegistryChanges(); // ✅ الجديد
+      _subscribeToRegistryChanges();
     } else if (type == 'result') {
       final id = msg['id'] as int;
       final success = msg['success'] as bool? ?? false;
@@ -184,19 +187,15 @@ class HAWebSocketService {
       final eventType = eventData?['event_type'];
 
       if (eventType == 'state_changed') {
-        // ✅ تحديث state الجهاز
         final newState = eventData['data']?['new_state'];
         if (newState != null) {
           _stateChangeController.add(newState);
         }
       } else if (eventType == 'floor_registry_updated') {
-        // ✅ اسم الـ floor اتغير → اجيب الـ floors من جديد
         _requestFloors();
       } else if (eventType == 'area_registry_updated') {
-        // ✅ اسم الـ room اتغير → اجيب الـ rooms من جديد
         _requestRooms();
       } else if (eventType == 'entity_registry_updated') {
-        // ✅ اسم الجهاز اتغير → اجيب الـ entity registry من جديد
         _requestEntityRegistry();
       }
     }
@@ -225,7 +224,6 @@ class HAWebSocketService {
     });
   }
 
-  // ✅ الجديد: اشترك في تغييرات الـ registry
   void _subscribeToRegistryChanges() {
     _send({
       'id': _msgId++,
@@ -247,6 +245,124 @@ class HAWebSocketService {
   void _send(Map<String, dynamic> data) {
     _channel?.sink.add(jsonEncode(data));
   }
+  //========================================
+
+  Future<void> setBrightness(String entityId, int brightness) async {
+    try {
+      if (entityId.startsWith('input_number.')) {
+        await _dio.post('/services/input_number/set_value', data: {
+          'entity_id': entityId,
+          'value': brightness,
+        });
+      } else {
+        await _dio.post('/services/light/turn_on', data: {
+          'entity_id': entityId,
+          'brightness': brightness,
+        });
+      }
+    } on DioException catch (e) {
+      throw e;
+    }
+  }
+
+  Future<void> setFanSpeed(String entityId, String speed) async {
+    try {
+      if (entityId.startsWith('input_select.')) {
+        await _dio.post('/services/input_select/select_option', data: {
+          'entity_id': entityId,
+          'option': speed,
+        });
+      } else {
+        await _dio.post('/services/fan/set_speed', data: {
+          'entity_id': entityId,
+          'speed': speed,
+        });
+      }
+    } on DioException catch (e) {
+      throw e;
+    }
+  }
+
+  Future<void> setCoverPosition(String entityId, int position) async {
+    try {
+      if (entityId.startsWith('input_number.')) {
+        await _dio.post('/services/input_number/set_value', data: {
+          'entity_id': entityId,
+          'value': position,
+        });
+      } else {
+        await _dio.post('/services/cover/set_cover_position', data: {
+          'entity_id': entityId,
+          'position': position,
+        });
+      }
+    } on DioException catch (e) {
+      throw e;
+    }
+  }
+
+  Future<void> setTemperature(String entityId, double temperature) async {
+    try {
+      if (entityId.startsWith('input_number.')) {
+        await _dio.post('/services/input_number/set_value', data: {
+          'entity_id': entityId,
+          'value': temperature,
+        });
+      } else {
+        await _dio.post('/services/climate/set_temperature', data: {
+          'entity_id': entityId,
+          'temperature': temperature,
+        });
+      }
+    } on DioException catch (e) {
+      throw e;
+    }
+  }
+
+  Future<void> setHVACMode(String entityId, String mode) async {
+    try {
+      if (entityId.startsWith('input_select.')) {
+        await _dio.post('/services/input_select/select_option', data: {
+          'entity_id': entityId,
+          'option': mode,
+        });
+      } else {
+        await _dio.post('/services/climate/set_hvac_mode', data: {
+          'entity_id': entityId,
+          'hvac_mode': mode,
+        });
+      }
+    } on DioException catch (e) {
+      throw e;
+    }
+  }
+  Future<void> setInputNumber(String entityId, double value) async {
+    try {
+      await _dio.post('/services/input_number/set_value', data: {
+        'entity_id': entityId,
+        'value': value,
+      });
+    } on DioException catch (e) {
+      throw e;
+    }
+  }
+
+  Future<void> setInputSelect(String entityId, String option) async {
+    try {
+      await _dio.post('/services/input_select/select_option', data: {
+        'entity_id': entityId,
+        'option': option,
+      });
+    } on DioException catch (e) {
+      throw e;
+    }
+  }
+
+
+
+
+
+  //=========================
 
   void _reconnect() {
     Future.delayed(const Duration(seconds: 3), connect);

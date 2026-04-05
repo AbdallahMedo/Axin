@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../cubits/ha_cubit/ha_cubit.dart';
-import '../cubits/ha_cubit/ha_state.dart';
-import 'room_one_view.dart';
+import 'package:axin/cubits/ha_cubit/ha_cubit.dart';
+import 'package:axin/cubits/ha_cubit/ha_state.dart';
+import 'package:axin/views/room_one_view.dart';
 
 class FloorOneView extends StatelessWidget {
   final String floorId;
@@ -73,12 +73,16 @@ class FloorOneView extends StatelessWidget {
 
                   return GestureDetector(
                     onTap: () {
+                      final cubit = context.read<HACubit>();
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => RoomOneView(
-                            roomId: roomId,
-                            roomName: roomName,
+                          builder: (context) => BlocProvider<HACubit>.value(
+                            value: cubit,
+                            child: RoomOneView(
+                              roomId: roomId,
+                              roomName: roomName,
+                            ),
                           ),
                         ),
                       );

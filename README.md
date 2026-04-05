@@ -1,29 +1,51 @@
 # Axin Smart Home App
 
-تطبيق ذكي للتحكم في المنزل باستخدام Home Assistant.
+**Axin Smart Home** is a modern mobile application designed to provide seamless control over smart home environments powered by Home Assistant.
 
-## هيكل الـ API النظيف (Clean API Structure)
+## Overview
 
-تم تنظيم الـ API بحيث يتبع تسلسل هرمي منطقي:
-1. **الطوابق (Floors)**: يتم جلب كافة الطوابق المسجلة في Home Assistant.
-2. **الغرف (Rooms/Areas)**: كل طابق يحتوي على الغرف المرتبطة به فقط.
-3. **الأجهزة (Entities)**: كل غرفة تحتوي على الأجهزة المرتبطة بها فقط.
+The app delivers a structured and intuitive experience by organizing the home into a clear hierarchy:
 
-### المسارات المستخدمة (Endpoints)
-- `GET /api/config`: لجلب إعدادات المنزل واسم المستخدم.
-- `GET /api/config/floor_registry`: لجلب قائمة الطوابق.
-- `GET /api/config/area_registry`: لجلب قائمة الغرف.
-- `GET /api/states`: لجلب حالة كافة الأجهزة وتصفيتها حسب الغرفة.
-- `POST /api/services/{domain}/toggle`: للتحكم في تشغيل وإطفاء الأجهزة.
+* **Floors** – Represents the main levels of the home
+* **Rooms** – Each floor contains its associated rooms
+* **Devices** – Each room includes its connected smart devices
 
-## الميزات الجديدة
-- **التحكم الديناميكي**: عرض الطوابق والغرف والأجهزة بناءً على البيانات الفعلية من Home Assistant.
-- **واجهة مستخدم محسنة**: تغيير مظهر حاوية الجهاز عند التشغيل (On) والإطفاء (Off) مع الحفاظ على ثيم التطبيق.
-- **إزالة الـ Weather API**: تم استبدال بيانات الطقس بتحية شخصية "Hi [Name]" باستخدام الاسم المسجل في النظام.
+This structure ensures users can easily navigate and control their environment with minimal effort.
 
-## كيفية الإعداد
-1. قم بتعديل `baseUrl` و `token` في ملف `lib/services/ha_service.dart`.
-2. تأكد من أن جهازك والـ Home Assistant على نفس الشبكة.
+## Core Features
 
-## الثيم (Theme)
-تم الحفاظ على الثيم الأصلي للتطبيق (Dark Blue) مع إضافة لمسات تفاعلية (Orange accent) للأجهزة النشطة.
+### Smart Device Control
+
+* Turn devices on/off instantly
+* Real-time status updates
+* Responsive and reliable interaction with Home Assistant
+
+### Dynamic Home Structure
+
+* Automatically reflects the actual configuration from Home Assistant
+* No manual setup of floors, rooms, or devices required
+
+### Intuitive User Experience
+
+* Clean and modern interface
+* Visual feedback for device states (On / Off)
+* Smooth navigation between floors, rooms, and devices
+
+### Personalized Experience
+
+* Displays a custom greeting using the user’s name
+* Simplified dashboard focused on essential controls
+
+## Design
+
+* **Theme:** Dark Blue base for a modern, comfortable viewing experience
+* **Accent Color:** Orange highlights for active devices
+* **UI Approach:** Minimal, fast, and user-friendly
+
+## Use Case
+
+Axin Smart Home is ideal for:
+
+* Individuals managing a single smart home system
+* Users who want a simple and organized control interface
+* Home Assistant users looking for a custom mobile experience
